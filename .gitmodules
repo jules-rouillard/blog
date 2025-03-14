@@ -2,3 +2,6 @@
 	path = jules_blog/public
 	url = https://github.com/julesrou1/julesrou1.github.io.git
 	branch = main
+[submodule "jules_blog/hugo-theme-console"]
+	path = jules_blog/themes/hugo-theme-console
+	url = https://github.com/mrmierzejewski/hugo-theme-console.git
