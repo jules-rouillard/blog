@@ -1,0 +1,4 @@
+[submodule "jules_blog/public"]
+	path = jules_blog/public
+	url = https://github.com/julesrou1/julesrou1.github.io.git
+	branch = main
