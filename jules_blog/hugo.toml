@@ -1,7 +1,7 @@
-baseURL = 'https://julesrou1.github.io/'
+baseURL = 'https://jules-rouillard.github.io/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
-#theme = "hugo-theme-console"
+title = 'Place holder'
+
 
 [params]
   # Cutting off the page title to two chars for mobile (console-demo -> co)
