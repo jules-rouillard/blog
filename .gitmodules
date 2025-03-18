@@ -1,0 +1,4 @@
+[submodule "jules_blog/public"]
+	path = jules_blog/public
+	url = https://github.com/jules-rouillard/jules-rouillard.github.io.git
+	branch = main
