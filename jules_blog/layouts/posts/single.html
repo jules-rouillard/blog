@@ -10,6 +10,13 @@
 {{ end }}
 <br/><br/>
 
+{{ if and (isset .Params "image") .Params.image }}
+    {{ $image := .Page.Resources.GetMatch .Params.image }}
+    {{ with $image }}
+        {{ printf `<img src="%s" alt="%s" class="img-responsive gallery-image">` .Title | safeHTML  }}
+    {{end}}
+{{ end }}
+
 {{ .TableOfContents }}
 {{ .Content }}
 {{ template "_internal/disqus.html" . }}
