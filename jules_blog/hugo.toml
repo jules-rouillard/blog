@@ -2,6 +2,11 @@ baseURL = 'https://jules-rouillard.github.io/'
 languageCode = 'en-us'
 title = 'Place holder'
 
+[markup]
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+    ordered = true
 
 [params]
   # Cutting off the page title to two chars for mobile (console-demo -> co)
