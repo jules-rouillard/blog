@@ -19,7 +19,7 @@
     --display-h1-decoration: none;
     --block-background-color: var(--background-color);
 /* Taken from console.css */
-    --background-color: #222225;
+    /* --background-color: #222225;
 	--page-width: 60em;
 	--font-color: #ffffff;
 	--invert-font-color: #222225;
@@ -29,7 +29,7 @@
 	--error-color: #ff3c74;
 	--progress-bar-background: #3f3f44;
 	--progress-bar-fill: #62c4ff;
-	--code-bg-color: #3f3f44;
+	--code-bg-color: #3f3f44; */
 }
 /* VVVVV Taken from console.css */
 
