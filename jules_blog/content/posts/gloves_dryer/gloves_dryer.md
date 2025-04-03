@@ -39,15 +39,14 @@ If the button is press while the system is in on state the timer will get reset 
 
 When using a sensor or any type of electronic component, it is important to understand how they behave and how to communicate with them.
 
-**TLDR: READ THE DATA SHEET**
+**TLDR: READ THE DATA SHEET**[^1]
 
 For standard components, you will be able to find someone online who took their time to write the firmware. This makes life easier.
 
 In this case, I first found an example for PIC micro and reused it without looking much into it.
 Nevertheless, it is a good exercise to try to rewrite it using the data sheet. So, here we go!
 
-https://www.mouser.com/datasheet/2/758/DHT11-Technical-Data-Sheet-Translated-Version-1143054.pdf
-
+[^1]: Data sheet for DHT11 from mouser [link](https://www.mouser.com/datasheet/2/758/DHT11-Technical-Data-Sheet-Translated-Version-1143054.pdf)
 
 The data sheet clearly explained the communication protocol. Since it's a single-wire two-way connection, understanding the timing for when the MCU/sensor is talking is crucial. To summarize:
 
@@ -64,27 +63,14 @@ With that, I came up with my time diagram.
 
 ### MCU code
 
-## Hardware
-
-### Fan control
-
-### Testing
-
-### PCB layout
 
 {{< highlight c >}}
 Timer2_OverflowCallbackRegister(myTimer2ISR);
 IO_RC5_SetInterruptHandler(get_ref_rh_and_start_timer);
 {{< /highlight >}}
 
-$$I_{E}=I_{B} +I_{C} $$
-$$I_{B}=\frac{V_p-V_{BE}}{I_B} $$
-
-
-
 
 {{< highlight c >}}
-
 
 void start_com(){
     IO_RC2_SetDigitalOutput();
@@ -97,7 +83,21 @@ void start_com(){
 {{< /highlight >}}
 
 
+## Hardware
+
+### Fan control
+
+$$I_{E}=I_{B} +I_{C} $$
+$$I_{B}=\frac{V_p-V_{BE}}{I_B} $$
+
+
+### Testing
 
 {{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="400">}}
+
+### PCB layout
+
+
+
 
 ## Compenent list
