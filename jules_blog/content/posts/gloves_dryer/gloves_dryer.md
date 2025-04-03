@@ -1,10 +1,8 @@
 +++
 title = 'Gloves Dryer'
 tag = ["test"]
-date = 2025-03-14T15:24:36Z
+date = 2025-04-03
 +++
-
-## Motivation
 
 Most days, I cycle to work, but I live in Ireland, and rain has become an inseparable part of the commute. 
 
@@ -12,8 +10,6 @@ While it is not a big issue as I carry spare clothes and shoes, my gloves and sh
 To reduce the time it takes to dry, one can use a few tricks. In this case, I went with a bit of ventilation. Having a small airflow can make a big difference especially since the air in the office is not saturated in water.
 
 The goal of the small project was to build a fan that would be controlled by a humidity sensor placed inside gloves/shoes.
-
-## Software and component used
 
 ## Defining expected behaviour
 The board will have 2 switches and one button. Which give us 4 possible states. The button is used to trigger a new read of the switches and change the state of the system.
@@ -37,12 +33,13 @@ If the button is press while the system is in on state the timer will get reset 
 | 1 | 0 | 3 |  | 
 | 1 | 1 | 4 | **Time control** | 
 
+## Software 
 
 ### Firmware for communication with the humidity sensor
 
 When using a sensor or any type of electronic component, it is important to understand how they behave and how to communicate with them.
 
-TLDR: READ THE DATA SHEET
+**TLDR: READ THE DATA SHEET**
 
 For standard components, you will be able to find someone online who took their time to write the firmware. This makes life easier.
 
@@ -66,6 +63,8 @@ With that, I came up with my time diagram.
 {{< figure src="/posts/gloves_dryer/time_diagram_dhr11.png" title="title of image" width="400">}}
 
 ### MCU code
+
+## Hardware
 
 ### Fan control
 
@@ -101,4 +100,4 @@ void start_com(){
 
 {{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="400">}}
 
-
+## Compenent list
