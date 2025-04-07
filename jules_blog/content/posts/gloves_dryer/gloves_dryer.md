@@ -87,8 +87,13 @@ void start_com(){
 
 ### Fan control
 
-$$I_{E}=I_{B} +I_{C} $$
-$$I_{B}=\frac{V_p-V_{BE}}{I_B} $$
+$$I_{C} \aprox \beta I_{B} $$
+
+$$I_{B}=\frac{V_p-V_{BE}}{R_B} $$
+$$R_{B}=\frac{V_p-V_{BE}}{I_B} $$
+$$R_{B}=\frac{5-0.7}{800.10^{-6}}=5375 $$
+
+$$I_{R}=\frac{0.810}{10} $$
 
 
 ### Testing
