@@ -33,18 +33,16 @@ If the button is press while the system is in on state the timer will get reset 
 | 1 | 0 | 3 |  | 
 | 1 | 1 | 4 | **Time control** | 
 
-## Software 
 
-### Firmware for communication with the humidity sensor
-
+## Firmware for communication with the humidity sensor 
 When using a sensor or any type of electronic component, it is important to understand how they behave and how to communicate with them.
 
 **TLDR: READ THE DATA SHEET**[^1]
 
-For standard components, you will be able to find someone online who took their time to write the firmware. This makes life easier.
+For standard components, you will be able to find someone online who took the time to write the firmware. This makes life easier.
 
 In this case, I first found an example for PIC micro and reused it without looking much into it.
-Nevertheless, it is a good exercise to try to rewrite it using the data sheet. So, here we go!
+Nevertheless, it is a good exercise to try to rewrite it using the datasheet. So, here we go!
 
 [^1]: Data sheet for DHT11 from mouser [link](https://www.mouser.com/datasheet/2/758/DHT11-Technical-Data-Sheet-Translated-Version-1143054.pdf)
 
@@ -52,36 +50,180 @@ The data sheet clearly explained the communication protocol. Since it's a single
 
 1. The MCU send a start signal
 2. The MCU wait for confirmation from the sensor that the message has been received
-3. The sensor will start sending the data, which will be a 40-bit message with 16 bits for the humidity, 16 bits for the temperature and an 8-bit check sum.
+3. The sensor will start sending the data **(higher data bit)**, which will be a 40-bit message with 16 bits for the humidity, 16 bits for the temperature and an 8-bit checksum.
 
 The differentiation between 0b0 and 0b1 in the message depends on the length of time in which the voltage is high.
 
 With that, I came up with my time diagram.
-(I did not like the figure 2 "Overall Communication Process" in the data sheet as it lacks time information.)
-
-{{< figure src="/posts/gloves_dryer/time_diagram_dhr11.png" title="title of image" width="400">}}
+(I did not like Figure 2, "Overall Communication Process" in the datasheet, as it lacks time information.)
 
 ### MCU code
 
+I will be using the PIC16F18126 an 8-bit microcontroller from Microchip for this project.
+
+Microchip IDE, MPLAB, as a plugin call MPLAB Code Configurator, MCC for short. It is a graphical programming environment that will generate most of the configuration code for the microcontroller. We don't need to spend hours in the data sheet and manually set all the necessary registers.
+
+In MCC, there are a few things we need to initialize. The pins we will use, the tmr2 and the delay module. As well as putting the button interruption EXT_INT at a higher priority than the tmr2 interrupt in the Interruption Manager.
+
+| | |
+|:-------------------------:|:-------------------------:|
+|{{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="100">}} | {{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="400">}}|
+
+
+......
+
+Now, we can move to writing our custom code. First, let's define some shortcuts and the variable we will use:
 
 {{< highlight c >}}
-Timer2_OverflowCallbackRegister(myTimer2ISR);
-IO_RC5_SetInterruptHandler(get_ref_rh_and_start_timer);
+#define SW1 RC4
+#define SW2 RC3
+#define F0 RC0
+#define F1 RC1
+
+unsigned char state, count_3h;
+unsigned char Check, T_byte1, T_byte2, RH_byte1, RH_byte2, Ch;
+unsigned Temp, RH, RH_ref, Sum;
 {{< /highlight >}}
 
+For the sensor communication, we will use the following to send the start signal:
 
 {{< highlight c >}}
-
-void start_com(){
+void send_start_signal() {
     IO_RC2_SetDigitalOutput();
     IO_RC2_SetLow();
     DELAY_milliseconds(18);
     IO_RC2_SetHigh();
-    DELAY_microseconds(15);
+    DELAY_microseconds(10);
     IO_RC2_SetDigitalInput();
 }
 {{< /highlight >}}
 
+To verify that the start command was detected:
+
+{{< highlight c >}}
+
+void is_sensor_start_detected() {
+    Check = 0;
+    DELAY_microseconds(40);
+    if (IO_RC2_GetValue() == 0) {
+        DELAY_microseconds(30);
+        if (IO_RC2_GetValue() == 1) {
+            Check = 1;
+            DELAY_microseconds(40);
+        }
+    }
+}
+{{< /highlight >}}
+
+And to read the data sent by the sensor 8bit by 8bit. (If needed reminder on bit manipulation in c[^2]).
+
+[^2]: C Bitwise Operators [link](https://www.tutorialspoint.com/cprogramming/c_bitwise_operators.htm)
+
+
+{{< highlight c >}}
+char ReadData() {
+    char i, j;
+    for (j = 0; j < 8; j++) {
+        while (!IO_RC2_GetValue()); //Wait until input goes high
+        DELAY_microseconds(30);
+        
+        //If input is low after 30us then the bit is a 0
+        if (IO_RC2_GetValue() == 0)
+            i &= ~(1 << (7 - j)); //Clear bit (7-b)
+        else {
+            i |= (1 << (7 - j)); //Set bit (7-b)
+            while (IO_RC2_GetValue());
+        } //Wait until PORTD.F0 goes LOW necessary since if a 1 still high after 30us
+    }
+    return i;
+}
+{{< /highlight >}}
+
+Let's defined the timer interruption. We will also use this timer for state 4. 18 interruptions will equal 3 hours.
+{{< highlight c >}}
+void myTimer2ISR(void) {
+    if (state == 2) {
+        //Read sensor
+        sensor_read();
+        //Compare to reference value
+        if (RH > (RH_ref + 5)) {
+            F0 = 1;
+            F1 = 1;
+        } else {
+            F0 = 0;
+            F1 = 0;
+        }
+    } else {
+        if (++count_3h >= 18) {
+            //After 3 hours timer2 and fans are turned off
+            count_3h = 0;
+            F0 = 0;
+            F1 = 0;
+            Timer2_Stop();
+        }
+    }
+}
+{{< /highlight >}}
+
+The button interruption is straightforward, it is just important to make sure we properly reset variables when changing states.
+{{< highlight c >}}
+void button_press(void) {
+    Timer2_Stop();
+    if (SW2 == 0 && SW1 == 0) {
+        // Always on Code 1
+        state = 1;
+        IO_RC0_Toggle();
+        IO_RC1_Toggle();
+    } else if (SW2 == 0 && SW1 == 1) {
+        // Sensor control Code 2
+        //Set reference humidity value and start timer2
+        state = 2;
+        sensor_read();
+        RH_ref = RH;
+        //Turn on fan as the first timer2ISR won't be done until 10min 
+        F0 = 1;
+        F1 = 1;
+        Timer2_Start();
+    } else if (SW2 == 1 && SW1 == 0) {
+        // Undefine Code 3
+        state = 3;
+        F0 = 0;
+        F1 = 0;
+    } else {
+        //Time control Code 4
+        state = 4;
+        count_3h = 0;
+        F0 = 1;
+        F1 = 1;
+        Timer2_Start();
+    }
+}
+{{< /highlight >}}
+
+Looking at the generated code by MCC we can find in timer header "tmr2.h" a function to link a custom call back to our timer interruption, we can also directly put custom code in tmr2.c for the default overflow callback.
+
+I prefer to link the call-back to a custom function in "main.c". It is easier to differentiate custom code from generated MCC code that way.
+{{< highlight c >}}
+int main(void) {
+    SYSTEM_Initialize();
+    Timer2_OverflowCallbackRegister(myTimer2ISR);
+    IO_RC5_SetInterruptHandler(button_press);
+    F0 = 0;
+    F1 = 0;
+    count_3h = 0;
+
+    // Enable the Global Interrupts 
+    INTERRUPT_GlobalInterruptEnable();
+    // Enable the Peripheral Interrupts 
+    INTERRUPT_PeripheralInterruptEnable();
+
+    while (1) {
+        //Nothing to do here
+    }
+}
+{{< /highlight >}}
+
+With this last step, the firmware for the PIC16F18126 is ready.
 
 ## Hardware
 
