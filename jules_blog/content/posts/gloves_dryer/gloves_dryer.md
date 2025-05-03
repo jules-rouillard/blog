@@ -59,6 +59,8 @@ The differentiation between 0b0 and 0b1 in the message depends on the length of 
 With that, I came up with my time diagram.
 (I did not like Figure 2, "Overall Communication Process" in the datasheet, as it lacks time information.)
 
+{{< figure src="/posts/gloves_dryer/time_diagram_dhr11.png" title="Figure 1: Communication time diagram" width="400">}}
+
 ### MCU code
 
 I will be using the PIC16F18126 an 8-bit microcontroller from Microchip for this project.
@@ -67,10 +69,15 @@ Microchip IDE, MPLAB, as a plugin call MPLAB Code Configurator, MCC for short. I
 
 In MCC, there are a few things we need to initialize. The pins we will use, the tmr2 and the delay module. As well as putting the button interruption EXT_INT at a higher priority than the tmr2 interrupt in the Interruption Manager.
 
-
-|{{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="100">}} | {{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="400">}}|
+|{{< figure src="/posts/gloves_dryer/pin_def.png" width="100">}} | {{< figure src="/posts/gloves_dryer/Project resource.png"  width="400">}}|
 |:-------------------------:|:-------------------------:|
 
+We will use the HFINTOSC clock, which runs at 32MHz, as the main clock for the MCU, but tmr 2 will use LFINTOSC clock, which runs at 31kHz. 
+For tmr2 we need to set up the clock source, prescaler, postsclaer and callbackrate to achieve an interruption callback every 10min (600s). I used the maximum value for the pre/post scaler (128/16).
+
+$$IntTime = \frac{Prescaler * Postscaler * CallbackRate}{f_{LFINTOSC}} $$
+
+$$CallbackRate = \frac{IntTime * f_{LFINTOSC}}{Prescaler * Postscaler} = \frac{ 600 * 31.10^{-6}}{128*16} $$
 
 Now, we can move to writing our custom code. First, let's define some shortcuts and the variable we will use:
 
@@ -272,3 +279,4 @@ To finalise the project, I designed a PCB on Kicad. And sent the Gerber files to
 {{< figure src="/posts/gloves_dryer/v2.jpg" title="Board V2">}}
 
 ## Compenent list
+
