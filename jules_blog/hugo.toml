@@ -1,6 +1,6 @@
 baseURL = 'https://jules-rouillard.github.io/'
 languageCode = 'en-us'
-title = 'Place holder'
+title = 'Jules Rouillard'
 
 [markup]
   [markup.tableOfContents]

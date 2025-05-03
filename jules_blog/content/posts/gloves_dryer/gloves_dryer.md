@@ -11,6 +11,8 @@ To reduce the time it takes to dry, one can use a few tricks. In this case, I we
 
 The goal of the small project was to build a fan that would be controlled by a humidity sensor placed inside gloves/shoes.
 
+Project file : https://github.com/jules-rouillard/gloves_dryer
+
 ## Defining expected behaviour
 The board will have 2 switches and one button. Which give us 4 possible states. The button is used to trigger a new read of the switches and change the state of the system.
 
@@ -65,12 +67,10 @@ Microchip IDE, MPLAB, as a plugin call MPLAB Code Configurator, MCC for short. I
 
 In MCC, there are a few things we need to initialize. The pins we will use, the tmr2 and the delay module. As well as putting the button interruption EXT_INT at a higher priority than the tmr2 interrupt in the Interruption Manager.
 
-| | |
-|:-------------------------:|:-------------------------:|
+
 |{{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="100">}} | {{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="400">}}|
+|:-------------------------:|:-------------------------:|
 
-
-......
 
 Now, we can move to writing our custom code. First, let's define some shortcuts and the variable we will use:
 
@@ -226,25 +226,49 @@ int main(void) {
 With this last step, the firmware for the PIC16F18126 is ready.
 
 ## Hardware
-
 ### Fan control
 
-$$I_{C} \aprox \beta I_{B} $$
+I found 12V DC at a PC shop, rated for 80mA. I only had BJT PN2222 with me to control the fan. 
+Using its data sheet, I verified that it is properly rated for our application.
+We can see DC gain is specified for current from 0.1mA to 500mA, but only for a VCE of 1V and 10V.
+From Figure 3, we can get the DC gain at 80mA for VCE = 1V is around 220. In reality, VCE will be much lower than 1V. To simplify, I will assume a DC gain of 100 and later measure it.
+
+{{< figure src="/posts/gloves_dryer/dc_current_gain.png">}}
+
+The following schematic summarises the Fan control circuit (Figure 4). We need to dimension RB to limit the current below 80mA.
+
+$$I_{C} \approx \beta I_{B} $$
 
 $$I_{B}=\frac{V_p-V_{BE}}{R_B} $$
 $$R_{B}=\frac{V_p-V_{BE}}{I_B} $$
-$$R_{B}=\frac{5-0.7}{800.10^{-6}}=5375 $$
-
-$$I_{R}=\frac{0.810}{10} $$
+$$R_{B}=\frac{5-0.7}{800.10^{-6}}=5375 \Omega $$
 
 
-### Testing
+{{< figure src="/posts/gloves_dryer/Diagram_bjt.png" title="Figure 4: Fan control circuit" height="400">}} | {{< figure src="/posts/gloves_dryer/Measured voltage.png" title="Figure 5: Measurement for DC gain estimation" height="400">}}
+:-------------------------:|:-------------------------:
 
-{{< figure src="/posts/gloves_dryer/test.jpg" title="title of image" width="400">}}
+I have set up the circuit on a breadboard and added a series 10-ohm resistor to measure the current. I measured a 0.82V drop across the resistor, which means an 82mA current going through.
+
+In Figure 5, I have annotated the voltage measurement without the 10-ohm resistor. From those, we can calculate the DC gain. I get a gain of 114, close enough to my first estimation. To be safer, I could increase the resistance to make sure we are below 80mA, but I did not bother doing it here. I have been using the fan for a while now with no issue. Also, the power supply I used can only deliver 12VDC 150mA, as such, the Fans are running below 80mA.
+
+$$I_{B}=\frac{4.95-0.66}{6000} = 715 \mu A $$
+$$\beta = \frac{I_{C}}{I_{B}} = \frac{82}{0.715} = 114 $$ 
+
+### First prototype testing
+
+{{< figure src="/posts/gloves_dryer/breadbord_testing.jpg" title="" >}} | {{< figure src="/posts/gloves_dryer/v1_testing.jpg" title="">}}
+:-------------------------:|:-------------------------:
+
+I used a solder board as the support for the prototype after testing on a breadboard. I tested the system with my gloves on a rainy day and it worked! 
+I did some adjustments to the timers and threshold value for the humidity sensor (code and timer shown above are post-adjustment)
 
 ### PCB layout
 
+To finalise the project, I designed a PCB on Kicad. And sent the Gerber files to a manufacturer.
 
+{{< figure src="/posts/gloves_dryer/LAYOUTPCB.png" title="Layout" height="600">}} | {{< figure src="/posts/gloves_dryer/v2_vs_v1.jpg" title="Prototype vs V2" height="600">}}
+:-------------------------:|:-------------------------:
 
+{{< figure src="/posts/gloves_dryer/v2.jpg" title="Board V2">}}
 
 ## Compenent list
