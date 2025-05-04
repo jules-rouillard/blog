@@ -74,10 +74,11 @@ In MCC, there are a few things we need to initialize. The pins we will use, the 
 
 We will use the HFINTOSC clock, which runs at 32MHz, as the main clock for the MCU, but tmr 2 will use LFINTOSC clock, which runs at 31kHz. 
 For tmr2 we need to set up the clock source, prescaler, postsclaer and callbackrate to achieve an interruption callback every 10min (600s). I used the maximum value for the pre/post scaler (128/16).
+This give us a callbackrate of 9082.
 
 $$IntTime = \frac{Prescaler * Postscaler * CallbackRate}{f_{LFINTOSC}} $$
 
-$$CallbackRate = \frac{IntTime * f_{LFINTOSC}}{Prescaler * Postscaler} = \frac{ 600 * 31.10^{-6}}{128*16} $$
+$$CallbackRate = \frac{IntTime * f_{LFINTOSC}}{Prescaler * Postscaler} = \frac{ 600 * 31.10^{-6}}{128*16} =9082.03 $$
 
 Now, we can move to writing our custom code. First, let's define some shortcuts and the variable we will use:
 
