@@ -243,6 +243,8 @@ From Figure 3, we can get the DC gain at 80mA for VCE = 1V is around 220. In rea
 
 {{< figure src="/posts/gloves_dryer/dc_current_gain.png">}}
 
+
+
 The following schematic summarises the Fan control circuit (Figure 4). We need to dimension RB to limit the current below 80mA.
 
 $$I_{C} \approx \beta I_{B} $$
@@ -274,8 +276,11 @@ I did some adjustments to the timers and threshold value for the humidity sensor
 
 To finalise the project, I designed a PCB on Kicad. And sent the Gerber files to a manufacturer.
 
-{{< figure src="/posts/gloves_dryer/LAYOUTPCB.png" title="Layout" height="600">}} | {{< figure src="/posts/gloves_dryer/v2_vs_v1.jpg" title="Prototype vs V2" height="600">}}
-:-------------------------:|:-------------------------:
+{{< figure src="/posts/gloves_dryer/LAYOUTPCB.png" title="Layout" class="half">}}
+
+{{< figure src="/posts/gloves_dryer/v2_vs_v1.jpg" title="Prototype vs V2" class="half">}}
+
+<!-- <img src="/posts/gloves_dryer/LAYOUTPCB.png"> -->
 
 {{< figure src="/posts/gloves_dryer/v2.jpg" title="Board V2">}}
 

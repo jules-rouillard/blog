@@ -989,6 +989,13 @@ figure>img {
     padding: 0
 }
 
+figure.half>img {
+    width: 50%;
+    display: block;
+    margin: auto;
+    width: 50%;
+}
+
 .terminal-avatarholder {
     width: calc(var(--global-space) * 5);
     height: calc(var(--global-space) * 5)
