@@ -7,14 +7,14 @@ date = 2025-04-03
 Most days, I cycle to work, but I live in Ireland, and rain has become an inseparable part of the commute. 
 
 While it is not a big issue as I carry spare clothes and shoes, my gloves and shoes do get wet and don’t dry over the workday. 
-To reduce the time it takes to dry, one can use a few tricks. In this case, I went with a bit of ventilation. Having a small airflow can make a big difference especially since the air in the office is not saturated in water.
+To reduce the time it takes to dry, one can use a few tricks. In this case, I went with a bit of ventilation. Having a small airflow can make a big difference, especially since the air in the office is not saturated in water.
 
 The goal of the small project was to build a fan that would be controlled by a humidity sensor placed inside gloves/shoes.
 
-Project file : https://github.com/jules-rouillard/gloves_dryer
+Project file: https://github.com/jules-rouillard/gloves_dryer
 
 ## Defining expected behaviour
-The board will have 2 switches and one button. Which give us 4 possible states. The button is used to trigger a new read of the switches and change the state of the system.
+The board will have 2 switches and one button. Which gives us 4 possible states. The button is used to trigger a new read of the switches and change the state of the system.
 
 There are 3 states that I want:
 
@@ -22,11 +22,11 @@ There are 3 states that I want:
 Fans are always on or off. The states are toggled with a button press.
 
 **Sensor control**
-The button press set the reference for humidity (the sensor should be outside the humid area). Then, the sensor should be placed in the humid area. The humidity rises until it passes the threshold, after which the fans are turned on until the humidity decreases below the threshold. The humidity value is checked periodically when the timer interrupt trigger.
+The button press sets the reference for humidity (the sensor should be outside the humid area). Then, the sensor should be placed in a humid area. The humidity rises until it passes the threshold, after which the fans are turned on until the humidity decreases below the threshold. The humidity value is checked periodically when the timer interrupt triggers.
 
 **Time control**
-The button press starts a timer for the on state, lasting 3 hours. After the timer runs out, the system will go into an off state until the button is press again.
-If the button is press while the system is in on state the timer will get reset and the on state will last a further 3 hours.
+The button press starts a timer for the on state, lasting 3 hours. After the timer runs out, the system will go into an off state until the button is pressed again.
+If the button is pressed while the system is in on state, the timer will get reset and the on state will last a further 3 hours.
 
 | SW2 | SW1 | Code | State | 
 | - | - | - | -----| 
@@ -65,7 +65,7 @@ With that, I came up with my time diagram.
 
 I will be using the PIC16F18126 an 8-bit microcontroller from Microchip for this project.
 
-Microchip IDE, MPLAB, as a plugin call MPLAB Code Configurator, MCC for short. It is a graphical programming environment that will generate most of the configuration code for the microcontroller. We don't need to spend hours in the data sheet and manually set all the necessary registers.
+Microchip IDE, MPLAB, as a plugin call MPLAB Code Configurator, MCC for short. It is a graphical programming environment that will generate most of the configuration code for the microcontroller. We don't need to spend hours on the data sheet and manually set all the necessary registers.
 
 In MCC, there are a few things we need to initialize. The pins we will use, the tmr2 and the delay module. As well as putting the button interruption EXT_INT at a higher priority than the tmr2 interrupt in the Interruption Manager.
 
@@ -147,7 +147,7 @@ char ReadData() {
 }
 {{< /highlight >}}
 
-Let's defined the timer interruption. We will also use this timer for state 4. 18 interruptions will equal 3 hours.
+Let's define the timer interruption. We will also use this timer for state 4. 18 interruptions will equal 3 hours.
 {{< highlight c >}}
 void myTimer2ISR(void) {
     if (state == 2) {
@@ -208,9 +208,9 @@ void button_press(void) {
 }
 {{< /highlight >}}
 
-Looking at the generated code by MCC we can find in timer header "tmr2.h" a function to link a custom call back to our timer interruption, we can also directly put custom code in tmr2.c for the default overflow callback.
+Looking at the generated code by MCC, we can find in the timer header "tmr2.h" a function to link a custom call back to our timer interruption. we can also directly put custom code in tmr2.c for the default overflow callback.
 
-I prefer to link the call-back to a custom function in "main.c". It is easier to differentiate custom code from generated MCC code that way.
+I prefer to link the callback to a custom function in "main.c". It is easier to differentiate custom code from generated MCC code that way.
 {{< highlight c >}}
 int main(void) {
     SYSTEM_Initialize();
@@ -279,5 +279,6 @@ To finalise the project, I designed a PCB on Kicad. And sent the Gerber files to
 
 {{< figure src="/posts/gloves_dryer/v2.jpg" title="Board V2">}}
 
-## Compenent list
+## Component list
+To add :s
 
